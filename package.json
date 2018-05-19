@@ -14,7 +14,11 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "webpack": "webpack --config webpack.config.js"
+    "webpack": "webpack --config webpack.config.js",
+    "webpack-prod": "webpack --config webpack.config.prod.js",
+    "docker-build": "docker build -t todo-api .",
+    "docker-run": "docker run -d --rm --name todo-api -p 3000:3000 todo-api",
+    "docker-stop": "docker stop todo-api"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0-beta.6",
