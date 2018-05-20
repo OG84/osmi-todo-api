@@ -25,6 +25,10 @@ export class TodosService {
             {
                 id: '3',
                 name: 'List 3'
+            },
+            {
+                id: '4',
+                name: 'List 6'
             }
         ];
     }
