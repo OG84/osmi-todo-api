@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of, EMPTY } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Todo } from 'todos/todo.model';
+import { Todo } from '../todos/todo.model';
 import { TodosRepository } from './todos.repository';
 
 @Injectable()

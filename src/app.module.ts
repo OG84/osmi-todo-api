@@ -4,8 +4,8 @@ import { AppService } from './app.service';
 import { TodosController } from './todos/todos.controller';
 import { TodosService } from './todos/todos.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Todo } from 'todos/todo.model';
-import { TodosRepository } from 'todos/todos.repository';
+import { Todo } from './todos/todo.model';
+import { TodosRepository } from './todos/todos.repository';
 
 @Module({
   imports: [
