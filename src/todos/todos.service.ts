@@ -1,35 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Injectable, Logger } from '@nestjs/common';
+import { Observable, of, EMPTY } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Todo } from 'todos/todo.model';
+import { TodosRepository } from './todos.repository';
 
 @Injectable()
 export class TodosService {
-    constructor() {
-
+    constructor(
+        private readonly todosRepository: TodosRepository) {
+        this.createDummyTodos();
     }
 
     getAll(): Observable<Todo[]> {
-        return of(this.createDummyTodos());
+        return this.todosRepository.findAll();
     }
 
-    private createDummyTodos(): Todo[] {
-        return [
+    upsert(todo: Todo): Observable<Todo> {
+        return this.todosRepository.upsert(todo);
+    }
+
+    private createDummyTodos(): void {
+        const dummyTodos = [
             {
-                id: '1',
                 name: 'List 1'
             },
             {
-                id: '2',
                 name: 'List 2'
             },
             {
-                id: '3',
                 name: 'List 3'
             },
             {
-                id: '4',
                 name: 'List 6'
             }
         ];
+
+        this.todosRepository.upsertMany(dummyTodos).pipe(
+            catchError(x => {
+                // console.log('xxxx hallo');
+                return EMPTY;
+            })
+        );
     }
 }
