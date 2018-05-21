@@ -9,6 +9,7 @@ RUN yarn webpack-prod
 FROM node as runtime-env
 WORKDIR /usr/app
 COPY --from=build-env /usr/app/dist .
+COPY --from=build-env /usr/app/config ./config
 
 EXPOSE 3000
 ENTRYPOINT [ "node", "server.js" ]

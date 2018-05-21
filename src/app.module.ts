@@ -6,7 +6,7 @@ import { TodosService } from './todos/todos.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Todo, todoCollectionName, todoSchema } from './todos/todo.model';
 import { TodosRepository } from './todos/todos.repository';
-import { ConfigService } from './config/config.service';
+import { ConfigService } from './config.service';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
@@ -30,7 +30,7 @@ const environment = environmentArgument ? environmentArgument.split('=')[1] : 'p
     TodosRepository,
     {
       provide: ConfigService,
-      useValue: new ConfigService(`src/config/${environment}.env`)
+      useValue: new ConfigService(`config/${environment}.env`)
     }
   ]
 })
