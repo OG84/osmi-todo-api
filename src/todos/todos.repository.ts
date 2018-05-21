@@ -1,27 +1,38 @@
-import { Todo } from './todo.model';
+import { Todo, todoCollectionName } from './todo.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable, of, from } from 'rxjs';
+import { TodoDto } from './todo.dto';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TodosRepository {
-    constructor(@InjectModel(Todo.collectionName) private readonly todoModel: Model<Todo>) {
+    constructor(@InjectModel(todoCollectionName) private readonly todoModel: Model<Todo>) {
 
     }
 
-    findAll(): Observable<Todo[]> {
+    findAll(): Observable<TodoDto[]> {
         const findAllPromise = this.todoModel.find().exec();
-        return of(findAllPromise);
+        return from(findAllPromise).pipe(
+            map((x: Todo[]) => x.map(todo => {
+                const todoDto: TodoDto = {
+                    id: todo.id,
+                    name: todo.name
+                };
+                return todoDto;
+            }))
+        );
     }
 
-    upsert(todo: Todo): Observable<Todo> {
-        const upsertPromise = new this.todoModel(todo).save();
+    upsert(todo: TodoDto): Observable<Todo> {
+        const upsertPromise = new this.todoModel(todo);
+        upsertPromise.save();
         return of(upsertPromise);
     }
 
-    upsertMany(todos: Todo[]): Observable<Todo[]> {
+    upsertMany(todos: TodoDto[]): Observable<Todo[]> {
         const upsertManyPromise = this.todoModel.insertMany(todos);
-        return of(upsertManyPromise);
+        return from(upsertManyPromise);
     }
 }

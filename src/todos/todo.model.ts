@@ -1,16 +1,17 @@
+import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 
-export class Todo {
+export interface Todo extends Document {
     id?: string;
     name: string;
-
-    static schema = new mongoose.Schema({
-        id: mongoose.SchemaTypes.ObjectId,
-        name: {
-            type: mongoose.SchemaTypes.String,
-            unique: true
-        }
-    });
-
-    static collectionName = 'Todo';
 }
+
+export const todoSchema = new mongoose.Schema({
+    id: mongoose.SchemaTypes.ObjectId,
+    name: {
+        type: mongoose.SchemaTypes.String,
+        unique: true
+    }
+});
+
+export const todoCollectionName = 'Todo';
