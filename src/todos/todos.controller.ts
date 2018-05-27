@@ -1,4 +1,4 @@
-import { Get, Controller, Post, Body } from '@nestjs/common';
+import { Get, Controller, Post, Body, Delete, Param } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { Observable } from 'rxjs';
 import { Todo } from 'todos/todo.model';
@@ -16,5 +16,10 @@ export class TodosController {
   @Post()
   add(@Body() todo): Observable<TodoDto> {
     return this.todosService.upsert(todo);
+  }
+
+  @Delete(':todoId')
+  delete(@Param('todoId') todoId: string): void {
+    this.todosService.delete(todoId);
   }
 }

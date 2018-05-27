@@ -17,7 +17,7 @@ export class TodosRepository {
         return from(findAllPromise).pipe(
             map((x: Todo[]) => x.map(todo => {
                 const todoDto: TodoDto = {
-                    id: todo.id,
+                    id: todo._id,
                     name: todo.name
                 };
                 return todoDto;
@@ -34,5 +34,9 @@ export class TodosRepository {
     upsertMany(todos: TodoDto[]): Observable<Todo[]> {
         const upsertManyPromise = this.todoModel.insertMany(todos);
         return from(upsertManyPromise);
+    }
+
+    delete(todoId: string): void {
+        this.todoModel.deleteOne({ _id: todoId });
     }
 }

@@ -20,6 +20,10 @@ export class TodosService {
         return this.todosRepository.upsert(todo);
     }
 
+    delete(todoId: string): void {
+        this.todosRepository.delete(todoId);
+    }
+
     private createDummyTodos(): void {
         const dummyTodos: TodoDto[] = [
             {
