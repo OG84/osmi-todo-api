@@ -9,7 +9,6 @@ import { TodoDto } from './todo.dto';
 export class TodosService {
     constructor(
         private readonly todosRepository: TodosRepository) {
-        this.createDummyTodos();
     }
 
     getAll(): Observable<TodoDto[]> {
@@ -22,29 +21,5 @@ export class TodosService {
 
     delete(todoId: string): void {
         this.todosRepository.delete(todoId);
-    }
-
-    private createDummyTodos(): void {
-        const dummyTodos: TodoDto[] = [
-            {
-                name: 'List 1'
-            },
-            {
-                name: 'List 2'
-            },
-            {
-                name: 'List 3'
-            },
-            {
-                name: 'List 6'
-            }
-        ];
-
-        this.todosRepository.upsertMany(dummyTodos).pipe(
-            catchError(x => {
-                // console.log('xxxx hallo');
-                return EMPTY;
-            })
-        );
     }
 }

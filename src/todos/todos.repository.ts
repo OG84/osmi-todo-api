@@ -39,8 +39,6 @@ export class TodosRepository {
     }
 
     delete(todoId: string): void {
-        this.logger.log(todoId);
-
         const result = this.todoModel.deleteOne({ _id: todoId }, (err) => {
             if (err) {
                 this.logger.error(err);
