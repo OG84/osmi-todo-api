@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodosController } from './todos/todos.controller';
@@ -31,7 +31,8 @@ const environment = environmentArgument ? environmentArgument.split('=')[1] : 'p
     {
       provide: ConfigService,
       useValue: new ConfigService(`config/${environment}.env`)
-    }
+    },
+    Logger
   ]
 })
 export class AppModule { }

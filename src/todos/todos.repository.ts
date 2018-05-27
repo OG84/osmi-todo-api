@@ -1,14 +1,16 @@
 import { Todo, todoCollectionName } from './todo.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of, from } from 'rxjs';
 import { TodoDto } from './todo.dto';
 import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TodosRepository {
-    constructor(@InjectModel(todoCollectionName) private readonly todoModel: Model<Todo>) {
+    constructor(
+        @InjectModel(todoCollectionName) private readonly todoModel: Model<Todo>,
+        private readonly logger: Logger) {
 
     }
 
@@ -37,6 +39,15 @@ export class TodosRepository {
     }
 
     delete(todoId: string): void {
-        this.todoModel.deleteOne({ _id: todoId });
+        this.logger.log(todoId);
+
+        const result = this.todoModel.deleteOne({ _id: todoId }, (err) => {
+            if (err) {
+                this.logger.error(err);
+                return;
+            }
+
+            this.logger.log(`todo ${todoId} deleted`);
+        });
     }
 }
