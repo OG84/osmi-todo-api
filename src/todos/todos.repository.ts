@@ -17,13 +17,13 @@ export class TodosRepository {
     findAll(): Observable<TodoDto[]> {
         const findAllPromise = this.todoModel.find().exec();
         return from(findAllPromise).pipe(
-            map((x: Todo[]) => x.map(todo => {
+            /*map((x: Todo[]) => x.map(todo => {
                 const todoDto: TodoDto = {
                     id: todo._id,
                     name: todo.name
                 };
                 return todoDto;
-            }))
+            }))*/
         );
     }
 
