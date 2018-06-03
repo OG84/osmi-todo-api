@@ -1,8 +1,9 @@
-import { Get, Controller, Post, Body, Delete, Param } from '@nestjs/common';
+import { Get, Controller, Post, Body, Delete, Param, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { Observable } from 'rxjs';
 import { Todo } from 'todos/todo.model';
 import { TodoDto } from './todo.dto';
+import { catchError } from 'rxjs/operators';
 
 @Controller('api/v1/todos')
 export class TodosController {

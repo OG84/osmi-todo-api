@@ -1,10 +1,11 @@
 import { Todo, todoCollectionName } from './todo.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, of, from } from 'rxjs';
 import { TodoDto } from './todo.dto';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
+import { DuplicateTodoException } from 'exceptions/duplicate-todo.exception';
 
 @Injectable()
 export class TodosRepository {
@@ -29,8 +30,12 @@ export class TodosRepository {
 
     upsert(todo: TodoDto): Observable<Todo> {
         const upsertPromise = new this.todoModel(todo);
-        upsertPromise.save();
-        return of(upsertPromise);
+
+        return from(upsertPromise.save()).pipe(
+            catchError(err => {
+                throw new DuplicateTodoException();
+            })
+        );
     }
 
     upsertMany(todos: TodoDto[]): Observable<Todo[]> {

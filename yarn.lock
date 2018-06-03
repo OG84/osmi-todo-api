@@ -9,47 +9,48 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nestjs/common@^5.0.0-beta.6":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-5.0.0.tgz#2c8efc94b7002bf2dc55204ec825432d7e1f53e8"
+"@nestjs/common@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-5.0.1.tgz#98378d3578c8d1f337452b06f83abad42e1e0cee"
   dependencies:
     axios "0.17.1"
     cli-color "1.2.0"
     deprecate "1.0.0"
     multer "1.3.0"
 
-"@nestjs/core@^5.0.0-beta.6":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-5.0.0.tgz#9b0081db47c306e744ed01907270b5cc6e6793c3"
+"@nestjs/core@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-5.0.1.tgz#24dd00bf6605ecc786e59cdf29d0f9cbe6b2a828"
   dependencies:
     body-parser "1.18.2"
     cors "2.8.4"
     express "4.16.3"
     iterare "0.0.8"
+    object-hash "1.3.0"
     optional "0.1.4"
 
-"@nestjs/microservices@^5.0.0-beta.6":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-5.0.0.tgz#249bb02517f69d4f83979dd515adb5deffed9879"
+"@nestjs/microservices@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-5.0.1.tgz#468c94178698d8f3ec91a2d1afdd910db3eb8704"
   dependencies:
     iterare "0.0.8"
     json-socket "^0.2.1"
     optional "0.1.4"
 
-"@nestjs/mongoose@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/mongoose/-/mongoose-4.0.0.tgz#22ddf074492e29a7a3244f95e881fde4c3f64aed"
-
-"@nestjs/testing@^5.0.0-beta.6":
+"@nestjs/mongoose@^5.0.0":
   version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-5.0.0.tgz#d44a48b9885a3160e31629b9fa8bee3512e931fd"
+  resolved "https://registry.yarnpkg.com/@nestjs/mongoose/-/mongoose-5.0.0.tgz#df9119dad115306e443a03b31760c43c35e293c1"
+
+"@nestjs/testing@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-5.0.1.tgz#a485a44f7613d8243f208d7fb3d7fce740ab5ead"
   dependencies:
     deprecate "1.0.0"
     optional "0.1.4"
 
-"@nestjs/websockets@^5.0.0-beta.6":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-5.0.0.tgz#a1c1e5cec9d5b42b6d15e3303eef74315691c226"
+"@nestjs/websockets@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-5.0.1.tgz#1714e05f3b75d18ba0a6031cbe0e3ac5fee52e12"
   dependencies:
     iterare "0.0.8"
     socket.io "^2.0.3"
@@ -92,7 +93,7 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@types/express@^4.0.39":
+"@types/express@^4.11.1":
   version "4.11.1"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.11.1.tgz#f99663b3ab32d04cb11db612ef5dd7933f75465b"
   dependencies:
@@ -120,9 +121,9 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@types/mongoose@^5.0.14":
-  version "5.0.14"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.0.14.tgz#74ab01137ffa840250764fdbf85c5f41dcaacc7b"
+"@types/mongoose@^5.0.15":
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.0.15.tgz#80da6b1f5225ddcfd75aec03a633f5b7b4d05786"
   dependencies:
     "@types/events" "*"
     "@types/mongodb" "*"
@@ -132,9 +133,9 @@
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.1.0.tgz#2783ee1b6c47cbd4044f4a233976c1ac5fa9e942"
 
-"@types/node@^9.3.0":
-  version "9.6.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.16.tgz#a20616348c3006277d458972ae16fe3b43b24ec1"
+"@types/node@^10.3.0":
+  version "10.3.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.3.0.tgz#078516315a84d56216b5d4fed8f75d59d3b16cac"
 
 "@types/serve-static@*":
   version "1.13.2"
@@ -2170,9 +2171,9 @@ dot-prop@^4.1.0:
   dependencies:
     is-obj "^1.0.0"
 
-dotenv@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-5.0.1.tgz#a5317459bd3d79ab88cff6e44057a6a3fbb1fcef"
+dotenv@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.0.0.tgz#24e37c041741c5f4b25324958ebbc34bca965935"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -4056,9 +4057,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-kareem@2.0.7:
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/kareem/-/kareem-2.0.7.tgz#8d260366a4df4236ceccec318fcf10c17c5beb22"
+kareem@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/kareem/-/kareem-2.1.0.tgz#d63197b57311830e4ceb3f34431f22f2de826a03"
 
 keyv@3.0.0:
   version "3.0.0"
@@ -4542,13 +4543,13 @@ mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/mongoose-legacy-pluralize/-/mongoose-legacy-pluralize-1.0.2.tgz#3ba9f91fa507b5186d399fb40854bff18fb563e4"
 
-mongoose@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.1.1.tgz#a7e925607e76032e5ef20b3035a357bc8581b45e"
+mongoose@^5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.1.3.tgz#77576b117d6387fb6dd0a6db95ac41b5882dac0a"
   dependencies:
     async "2.1.4"
     bson "~1.0.5"
-    kareem "2.0.7"
+    kareem "2.1.0"
     lodash.get "4.4.2"
     mongodb "3.0.8"
     mongoose-legacy-pluralize "1.0.2"
@@ -4836,6 +4837,10 @@ object-copy@^0.1.0:
     copy-descriptor "^0.1.0"
     define-property "^0.2.5"
     kind-of "^3.0.3"
+
+object-hash@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-1.3.0.tgz#76d9ba6ff113cf8efc0d996102851fe6723963e2"
 
 object-visit@^1.0.0:
   version "1.0.1"
@@ -5709,9 +5714,9 @@ rxjs@^5.4.2, rxjs@^5.5.2:
   dependencies:
     symbol-observable "1.0.1"
 
-rxjs@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.1.0.tgz#833447de4e4f6427b9cec3e5eb9f56415cd28315"
+rxjs@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.2.0.tgz#e024d0e180b72756a83c2aaea8f25423751ba978"
   dependencies:
     tslib "^1.9.0"
 
