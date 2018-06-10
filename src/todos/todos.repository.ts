@@ -6,6 +6,7 @@ import { Observable, of, from } from 'rxjs';
 import { TodoDto } from './todo.dto';
 import { map, catchError } from 'rxjs/operators';
 import { DuplicateTodoException } from 'exceptions/duplicate-todo.exception';
+import { UpdateTodoException } from 'exceptions/update-todo.exception';
 
 @Injectable()
 export class TodosRepository {
@@ -28,19 +29,32 @@ export class TodosRepository {
         );
     }
 
-    upsert(todo: TodoDto): Observable<Todo> {
-        const upsertPromise = new this.todoModel(todo);
+    update(todo: TodoDto): Observable<Todo> {
+        const updateTodo = new this.todoModel(todo);
+        return Observable.create(observer => {
+            this.todoModel.findByIdAndUpdate(updateTodo.id, updateTodo, (err, res) => {
+                if (err) {
+                    throw new UpdateTodoException();
+                }
 
-        return from(upsertPromise.save()).pipe(
+                observer.next(updateTodo);
+                observer.complete();
+            });
+        }).pipe(
             catchError(err => {
                 throw new DuplicateTodoException();
             })
         );
     }
 
-    upsertMany(todos: TodoDto[]): Observable<Todo[]> {
-        const upsertManyPromise = this.todoModel.insertMany(todos);
-        return from(upsertManyPromise);
+    create(todo: TodoDto): Observable<Todo> {
+        const newTodo = new this.todoModel(todo);
+
+        return from(newTodo.save()).pipe(
+            catchError(err => {
+                throw new DuplicateTodoException();
+            })
+        );
     }
 
     delete(todoId: string): void {

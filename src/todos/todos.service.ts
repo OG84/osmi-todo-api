@@ -8,15 +8,23 @@ import { TodoDto } from './todo.dto';
 @Injectable()
 export class TodosService {
     constructor(
-        private readonly todosRepository: TodosRepository) {
+        private readonly todosRepository: TodosRepository,
+        private readonly logger: Logger) {
     }
 
     getAll(): Observable<TodoDto[]> {
         return this.todosRepository.findAll();
     }
 
-    upsert(todo: Todo): Observable<Todo> {
-        return this.todosRepository.upsert(todo);
+    upsert(todo: TodoDto): Observable<Todo> {
+        this.logger.log(JSON.stringify(todo));
+        if (!todo._id) {
+            this.logger.log('creating');
+            return this.todosRepository.create(todo);
+        }
+
+        this.logger.log('updating');
+        return this.todosRepository.update(todo);
     }
 
     delete(todoId: string): void {

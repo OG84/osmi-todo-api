@@ -1,4 +1,4 @@
 export interface TodoDto {
-    id?: string;
+    _id?: string;
     name: string;
 }
