@@ -16,8 +16,17 @@ export class TodosService {
         return this.todosRepository.findAll();
     }
 
+    getById(id: string): Observable<TodoDto> {
+        return this.todosRepository.findById(id);
+    }
+
     upsert(todo: TodoDto): Observable<Todo> {
+
+        if (!todo.todos) {
+            todo.todos = [];
+        }
         this.logger.log(JSON.stringify(todo));
+
         if (!todo._id) {
             this.logger.log('creating');
             return this.todosRepository.create(todo);

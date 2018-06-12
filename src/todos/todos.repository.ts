@@ -5,8 +5,10 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, of, from } from 'rxjs';
 import { TodoDto } from './todo.dto';
 import { map, catchError } from 'rxjs/operators';
-import { DuplicateTodoException } from 'exceptions/duplicate-todo.exception';
+import { CreateTodoException } from 'exceptions/create-todo.exception';
 import { UpdateTodoException } from 'exceptions/update-todo.exception';
+import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
+import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
 
 @Injectable()
 export class TodosRepository {
@@ -18,22 +20,36 @@ export class TodosRepository {
 
     findAll(): Observable<TodoDto[]> {
         const findAllPromise = this.todoModel.find().exec();
-        return from(findAllPromise).pipe(
-            /*map((x: Todo[]) => x.map(todo => {
-                const todoDto: TodoDto = {
-                    id: todo._id,
-                    name: todo.name
-                };
-                return todoDto;
-            }))*/
+        return from(findAllPromise);
+    }
+
+    findById(id: string): Observable<TodoDto> {
+        return Observable.create(observer => {
+            this.logger.warn('searching for ' + id);
+            this.todoModel.findById(id, (err, res) => {
+                if (err) {
+                    this.logger.error(err);
+                    throw new TodoNotFoundException(err);
+                }
+
+                observer.next(res);
+                observer.complete();
+            });
+        }).pipe(
+            catchError(err => {
+                this.logger.error(err);
+                throw new TodoNotFoundException(err);
+            })
         );
     }
 
     update(todo: TodoDto): Observable<Todo> {
         const updateTodo = new this.todoModel(todo);
         return Observable.create(observer => {
-            this.todoModel.findByIdAndUpdate(updateTodo.id, updateTodo, (err, res) => {
+            this.logger.warn(updateTodo);
+            this.todoModel.findByIdAndUpdate(updateTodo._id, updateTodo, { upsert: true, new: true }, (err, res) => {
                 if (err) {
+                    this.logger.error(err);
                     throw new UpdateTodoException();
                 }
 
@@ -42,7 +58,8 @@ export class TodosRepository {
             });
         }).pipe(
             catchError(err => {
-                throw new DuplicateTodoException();
+                this.logger.error(err);
+                throw new DuplicateTodoException(err);
             })
         );
     }
@@ -52,7 +69,7 @@ export class TodosRepository {
 
         return from(newTodo.save()).pipe(
             catchError(err => {
-                throw new DuplicateTodoException();
+                throw new CreateTodoException(err);
             })
         );
     }
