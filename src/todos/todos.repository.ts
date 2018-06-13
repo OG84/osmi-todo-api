@@ -46,7 +46,6 @@ export class TodosRepository {
     update(todo: TodoDto): Observable<Todo> {
         const updateTodo = new this.todoModel(todo);
         return Observable.create(observer => {
-            this.logger.warn(updateTodo);
             this.todoModel.findByIdAndUpdate(updateTodo._id, updateTodo, { upsert: true, new: true }, (err, res) => {
                 if (err) {
                     this.logger.error(err);
