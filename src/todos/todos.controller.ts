@@ -24,7 +24,7 @@ export class TodosController {
   }
 
   @Post(':parentTodoId')
-  createChild(@Param('parentTodoId') parentTodoId: string, @Body() todo): Observable<TodoDto> {
+  createChild(@Param('parentTodoId') parentTodoId: string, @Body() todo: TodoDto): Observable<TodoDto> {
     return this.todosService.getAll().pipe(
       switchMap(todos => {
         for (const rootTodo of todos) {
@@ -36,6 +36,7 @@ export class TodosController {
               throw new DuplicateTodoException('');
             }
 
+            todo.parentId = parentTodoId;
             parentTodo.todos.push(todo);
             return this.todosService.upsert(rootTodo);
           }
