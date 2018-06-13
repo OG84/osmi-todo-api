@@ -25,55 +25,52 @@ export class TodosController {
 
   @Post(':parentTodoId')
   createChild(@Param('parentTodoId') parentTodoId: string, @Body() todo: TodoDto): Observable<TodoDto> {
+    this.logger.log('111');
     return this.todosService.getAll().pipe(
       switchMap(todos => {
         for (const rootTodo of todos) {
-          const parentTodo = this.findTodoById(rootTodo, parentTodoId);
-
-          if (parentTodo) {
-            const existingTodo = parentTodo.todos.find(x => x.name === todo.name);
-            if (existingTodo) {
-              throw new DuplicateTodoException('');
-            }
-
-            todo.parentId = parentTodoId;
-            parentTodo.todos.push(todo);
-            return this.todosService.upsert(rootTodo);
+          const parentTodo = this.todosService.findTodoById(rootTodo, parentTodoId);
+          if (!parentTodo) {
+            continue;
           }
+
+          const existingTodo = this.todosService.findTodoById(parentTodo, todo._id);
+
+          if (existingTodo && todo.parentId !== parentTodoId) {
+            throw new HttpException('parent id not matching with existing one', HttpStatus.BAD_REQUEST);
+          }
+
+          const todoWithSameName = parentTodo.todos.find(x => x.name === todo.name);
+          if (todoWithSameName) {
+            throw new DuplicateTodoException('');
+          }
+
+          todo.parentId = parentTodoId;
+
+          if (!existingTodo) {
+            parentTodo.todos.push(todo);
+          } else {
+            const indexOfExistingTodo = parentTodo.todos.findIndex(x => x._id.toString() === todo._id);
+            parentTodo.todos[indexOfExistingTodo] = todo;
+          }
+
+          return this.todosService.upsert(rootTodo);
         }
 
-        throw new TodoNotFoundException('');
+
+        throw new TodoNotFoundException(`id ${parentTodoId} not found`);
       })
     );
   }
 
-  @Put(':todoId')
+  /*@Put(':todoId')
   update(@Param('todoId') todoId: string, @Body() todo): Observable<TodoDto> {
     //TODO
     return this.todosService.upsert(todo);
-  }
+  }*/
 
   @Delete(':todoId')
   delete(@Param('todoId') todoId: string): void {
     this.todosService.delete(todoId);
-  }
-
-  private findTodoById(todo: TodoDto, id: string): TodoDto {
-    if (todo._id.toString() === id) {
-      return todo;
-    }
-
-    for (const childTodo of todo.todos) {
-      if (todo._id.toString() === id) {
-        return todo;
-      }
-
-      const childChildTodo = this.findTodoById(childTodo, id);
-      if (childChildTodo) {
-        return childChildTodo;
-      }
-    }
-
-    return null;
   }
 }

@@ -39,4 +39,20 @@ export class TodosService {
     delete(todoId: string): void {
         this.todosRepository.delete(todoId);
     }
+
+    findTodoById(todo: TodoDto, id: string): TodoDto {
+        if (!todo) {
+            return null;
+        }
+
+        if (todo._id.toString() === id) {
+            return todo;
+        }
+
+        for (const subTodo of todo.todos) {
+            return this.findTodoById(subTodo, id);
+        }
+
+        return null;
+    }
 }
