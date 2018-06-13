@@ -5,8 +5,8 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, of, from } from 'rxjs';
 import { TodoDto } from './todo.dto';
 import { map, catchError } from 'rxjs/operators';
-import { CreateTodoException } from 'exceptions/create-todo.exception';
-import { UpdateTodoException } from 'exceptions/update-todo.exception';
+import { CreateTodoException } from '../exceptions/create-todo.exception';
+import { UpdateTodoException } from '../exceptions/update-todo.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
 import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
 

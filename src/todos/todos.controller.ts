@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { Todo } from 'todos/todo.model';
 import { TodoDto } from './todo.dto';
 import { catchError, switchMap } from 'rxjs/operators';
-import { TodoNotFoundException } from 'exceptions/todo-not-found.exception';
-import { DuplicateTodoException } from 'exceptions/duplicate-todo.exception';
+import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
+import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
 
 @Controller('api/v1/todos')
 export class TodosController {
