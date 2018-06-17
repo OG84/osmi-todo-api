@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 export interface Todo extends Document {
     parentId: string;
     name: string;
+    dueDate: string;
 
     findParent(): Promise<Todo>;
 }
@@ -23,7 +24,12 @@ todoSchema.add({
     },
     name: {
         type: mongoose.SchemaTypes.String,
-        unique: true
+        unique: true,
+        required: true
+    },
+    dueDate: {
+        type: mongoose.SchemaTypes.Date,
+        index: true
     }
 });
 
