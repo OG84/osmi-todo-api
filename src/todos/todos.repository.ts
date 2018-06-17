@@ -34,36 +34,9 @@ export class TodosRepository {
         );
     }
 
-    upsert(todo: TodoDto): Observable<Todo> {
-        this.logger.log(`upsert: ${JSON.stringify(todo)}`);
+    create(todo: TodoDto): Observable<Todo> {
+        this.logger.log(`create: ${JSON.stringify(todo)}`);
 
-        if (todo._id) {
-            return this.update(todo);
-        }
-
-        return this.create(todo);
-    }
-
-    delete(todoId: string): Observable<void> {
-        this.logger.log(`delete ${todoId}`);
-
-        return from(this.todoModel.deleteOne({ _id: todoId })).pipe(
-            catchError(x => {
-                throw new TodoNotFoundException(todoId);
-            })
-        );
-    }
-
-    private update(todo: TodoDto): Observable<Todo> {
-        this.logger.log('update');
-        return from(this.todoModel.findOneAndUpdate({upsert: true}, todo)).pipe(
-            catchError(x => {
-                throw new CreateTodoException();
-            })
-        );
-    }
-
-    private create(todo: TodoDto): Observable<Todo> {
         return from(this.todoModel.create(todo)).pipe(
             catchError(x => {
                 if (this.isDuplicateKeyError(x)) {
@@ -73,6 +46,22 @@ export class TodosRepository {
                 throw new CreateTodoException();
             })
         );
+    }
+
+    update(todo: TodoDto): Observable<Todo> {
+        this.logger.log(`update: ${JSON.stringify(todo)}`);
+
+        return from(this.todoModel.findByIdAndUpdate(todo._id, todo, { new: true })).pipe(
+            catchError(x => {
+                throw new CreateTodoException();
+            })
+        );
+    }
+
+    delete(todoId: string): Observable<Todo> {
+        this.logger.log(`delete ${todoId}`);
+
+        return from(this.todoModel.findByIdAndRemove(todoId));
     }
 
     private isDuplicateKeyError(error: any): boolean {

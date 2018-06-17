@@ -20,11 +20,15 @@ export class TodosService {
         return this.todosRepository.findById(id);
     }
 
-    upsert(todo: TodoDto): Observable<Todo> {
-        return this.todosRepository.upsert(todo);
+    create(todo: TodoDto): Observable<Todo> {
+        return this.todosRepository.create(todo);
     }
 
-    delete(todoId: string): Observable<void> {
+    update(todo: TodoDto): Observable<Todo> {
+        return this.todosRepository.update(todo);
+    }
+
+    delete(todoId: string): Observable<Todo> {
         return this.todosRepository.delete(todoId);
     }
 }
