@@ -24,8 +24,7 @@ todoSchema.add({
     },
     name: {
         type: mongoose.SchemaTypes.String,
-        unique: true,
-        required: true
+        unique: true
     },
     dueDate: {
         type: mongoose.SchemaTypes.Date,
