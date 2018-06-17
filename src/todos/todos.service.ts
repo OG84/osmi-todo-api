@@ -20,6 +20,10 @@ export class TodosService {
         return this.todosRepository.findById(id);
     }
 
+    getByParentId(parentId: string): Observable<TodoDto[]> {
+        return this.todosRepository.findByParentId(parentId);
+    }
+
     create(todo: TodoDto): Observable<Todo> {
         return this.todosRepository.create(todo);
     }

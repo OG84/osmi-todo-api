@@ -15,7 +15,11 @@ export class TodosController {
     private readonly logger: Logger) { }
 
   @Get()
-  getAll(): Observable<TodoDto[]> {
+  getAll(@Query('parentId') parentId: string): Observable<TodoDto[]> {
+    if (parentId) {
+      return this.todosService.getByParentId(parentId);
+    }
+
     return this.todosService.getRoots();
   }
 
@@ -36,6 +40,10 @@ export class TodosController {
   @Put(':todoId')
   update(@Param('todoId') todoId: string, @Body() todo: TodoDto): Observable<TodoDto> {
     if (todoId !== todo._id) {
+      throw new BadRequestException();
+    }
+
+    if (todo._id === todo.parentId) {
       throw new BadRequestException();
     }
 

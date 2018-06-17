@@ -11,6 +11,7 @@ export interface Todo extends Document {
 
 export interface TodoModel extends Model<Todo> {
     findRoots(): Promise<Todo[]>;
+    findByParentId(parentId: string): Promise<Todo[]>;
 }
 
 export const todoSchema = new mongoose.Schema();
@@ -33,5 +34,9 @@ todoSchema.methods.findParent = function (cb) {
 todoSchema.statics.findRoots = function (cb) {
     return this.find({ parentId: null }, cb);
 };
+
+todoSchema.statics.findByParentId = function (parentId: string, cb) {
+    return this.find({ parentId: parentId }, cb);
+}
 
 export const todoCollectionName = 'Todo';

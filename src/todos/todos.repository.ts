@@ -34,6 +34,12 @@ export class TodosRepository {
         );
     }
 
+    findByParentId(parentId: string): Observable<TodoDto[]> {
+        this.logger.log(`findByParentId: ${parentId}`);
+
+        return from(this.todoModel.findByParentId(parentId));
+    }
+
     create(todo: TodoDto): Observable<Todo> {
         this.logger.log(`create: ${JSON.stringify(todo)}`);
 
