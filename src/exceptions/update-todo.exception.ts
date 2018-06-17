@@ -1,7 +1,7 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
-export class UpdateTodoException extends HttpException {
+export class UpdateTodoException extends BadRequestException {
     constructor() {
-        super('todo-update-error', HttpStatus.BAD_REQUEST);
+        super('todo-update-error', 'could-not-update');
     }
 }
