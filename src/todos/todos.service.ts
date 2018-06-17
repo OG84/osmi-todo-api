@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of, EMPTY } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Todo } from '../todos/todo.model';
 import { TodosRepository } from './todos.repository';
 import { TodoDto } from './todo.dto';
@@ -12,8 +12,8 @@ export class TodosService {
         private readonly logger: Logger) {
     }
 
-    getAll(): Observable<TodoDto[]> {
-        return this.todosRepository.findAll();
+    getRoots(): Observable<Todo[]> {
+        return this.todosRepository.findRoots();
     }
 
     getById(id: string): Observable<TodoDto> {
@@ -21,38 +21,10 @@ export class TodosService {
     }
 
     upsert(todo: TodoDto): Observable<Todo> {
-
-        if (!todo.todos) {
-            todo.todos = [];
-        }
-        this.logger.log(JSON.stringify(todo));
-
-        if (!todo._id) {
-            this.logger.log('creating');
-            return this.todosRepository.create(todo);
-        }
-
-        this.logger.log('updating');
-        return this.todosRepository.update(todo);
+        return this.todosRepository.upsert(todo);
     }
 
-    delete(todoId: string): void {
-        this.todosRepository.delete(todoId);
-    }
-
-    findTodoById(todo: TodoDto, id: string): TodoDto {
-        if (!todo) {
-            return null;
-        }
-
-        if (todo._id.toString() === id) {
-            return todo;
-        }
-
-        for (const subTodo of todo.todos) {
-            return this.findTodoById(subTodo, id);
-        }
-
-        return null;
+    delete(todoId: string): Observable<void> {
+        return this.todosRepository.delete(todoId);
     }
 }

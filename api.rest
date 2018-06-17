@@ -1,0 +1,19 @@
+GET http://localhost:3000/api/v1/todos
+
+###
+
+POST http://localhost:3000/api/v1/todos
+content-type: application/json
+
+{
+    "name": "c1",
+    "parentId": "5b262dea7f02b042a064eb3c"
+}
+
+###
+
+GET http://localhost:3000/api/v1/todos/123
+
+###
+
+DELETE http://localhost:3000/api/v1/todos/123
