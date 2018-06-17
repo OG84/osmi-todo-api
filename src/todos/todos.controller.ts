@@ -34,6 +34,10 @@ export class TodosController {
       throw new BadRequestException();
     }
 
+    if (todo._id === null || todo._id === undefined) {
+      delete todo._id;
+    }
+
     return this.todosService.create(todo);
   }
 

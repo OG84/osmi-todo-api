@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, of, from, throwError } from 'rxjs';
 import { TodoDto } from './todo.dto';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import { CreateTodoException } from '../exceptions/create-todo.exception';
 import { UpdateTodoException } from '../exceptions/update-todo.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
@@ -43,13 +43,26 @@ export class TodosRepository {
     create(todo: TodoDto): Observable<Todo> {
         this.logger.log(`create: ${JSON.stringify(todo)}`);
 
-        return from(this.todoModel.create(todo)).pipe(
-            catchError(x => {
-                if (this.isDuplicateKeyError(x)) {
+        return this.findByParentId(todo.parentId).pipe(
+            switchMap(todosWithSameParentId => {
+                const nameAlreadyExistsInSiblingTodo = todosWithSameParentId
+                    .find(x => x.name === todo.name);
+
+                if (nameAlreadyExistsInSiblingTodo) {
                     throw new DuplicateTodoException(todo);
                 }
 
-                throw new CreateTodoException();
+                return from(this.todoModel.create(todo)).pipe(
+                    catchError(err => {
+                        this.logger.error(JSON.stringify(err));
+
+                        if (this.isDuplicateKeyError(err)) {
+                            throw new DuplicateTodoException(todo);
+                        }
+
+                        throw new CreateTodoException();
+                    })
+                );
             })
         );
     }
@@ -59,6 +72,7 @@ export class TodosRepository {
 
         return from(this.todoModel.findByIdAndUpdate(todo._id, todo, { new: true })).pipe(
             catchError(x => {
+                this.logger.error(x);
                 throw new CreateTodoException();
             })
         );
