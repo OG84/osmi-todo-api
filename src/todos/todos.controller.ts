@@ -49,7 +49,11 @@ export class TodosController {
     @Query('copyChildrenFromId') copyChildrenFromId: string): Observable<TodoDto> {
 
     if (todo._id) {
-      throw new BadRequestException();
+      throw new BadRequestException('id required');
+    }
+
+    if (todo.parentId === copyChildrenFromId) {
+      throw new BadRequestException('cannot copy todo into itself');
     }
 
     if (todo._id === null || todo._id === undefined) {
