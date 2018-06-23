@@ -1,4 +1,19 @@
-import { Get, Controller, Post, Body, Delete, Param, Res, HttpStatus, HttpException, Put, Logger, Query, UseFilters, BadRequestException } from '@nestjs/common';
+import {
+  Get,
+  Controller,
+  Post,
+  Body,
+  Delete,
+  Param,
+  Res,
+  HttpStatus,
+  HttpException,
+  Put,
+  Logger,
+  Query,
+  UseFilters,
+  BadRequestException
+} from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { Observable } from 'rxjs';
 import { Todo } from 'todos/todo.model';
@@ -29,7 +44,10 @@ export class TodosController {
   }
 
   @Post()
-  create(@Body() todo: TodoDto): Observable<TodoDto> {
+  create(
+    @Body() todo: TodoDto,
+    @Query('copyChildrenFromId') copyChildrenFromId: string): Observable<TodoDto> {
+
     if (todo._id) {
       throw new BadRequestException();
     }
@@ -38,17 +56,20 @@ export class TodosController {
       delete todo._id;
     }
 
-    return this.todosService.create(todo);
+    return this.todosService.create(todo, copyChildrenFromId);
   }
 
   @Put(':todoId')
   update(@Param('todoId') todoId: string, @Body() todo: TodoDto): Observable<TodoDto> {
+    if (!todoId) {
+      throw new BadRequestException('todoId path param required');
+    }
     if (todoId !== todo._id) {
-      throw new BadRequestException();
+      throw new BadRequestException('todoId path param does not match body');
     }
 
     if (todo._id === todo.parentId) {
-      throw new BadRequestException();
+      throw new BadRequestException('todo cannot have itself as parent');
     }
 
     return this.todosService.update(todo);
