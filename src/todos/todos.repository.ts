@@ -70,7 +70,7 @@ export class TodosRepository {
     update(todo: TodoDto): Observable<Todo> {
         this.logger.log(`update: ${JSON.stringify(todo)}`);
 
-        return from(this.todoModel.findByIdAndUpdate(todo._id, todo, { new: true })).pipe(
+        return from(this.todoModel.replaceOne({_id: todo._id}, todo)).pipe(
             catchError(x => {
                 this.logger.error(x);
                 throw new CreateTodoException();
