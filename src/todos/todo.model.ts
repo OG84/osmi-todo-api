@@ -1,11 +1,11 @@
 import { Document, Model } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Observable } from 'rxjs';
 
 export interface Todo extends Document {
     parentId: string;
     name: string;
     dueDate: string;
+    path: string;
 
     findParent(): Promise<Todo>;
 }
@@ -28,6 +28,9 @@ todoSchema.add({
     dueDate: {
         type: mongoose.SchemaTypes.Date,
         index: true
+    },
+    path: {
+        type: mongoose.SchemaTypes.String
     }
 });
 
@@ -41,6 +44,6 @@ todoSchema.statics.findRoots = function (cb) {
 
 todoSchema.statics.findByParentId = function (parentId: string, cb) {
     return this.find({ parentId: parentId }, cb);
-}
+};
 
 export const todoCollectionName = 'Todo';
