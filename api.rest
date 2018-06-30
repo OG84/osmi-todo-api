@@ -2,7 +2,11 @@ GET http://localhost:3000/api/v1/todos
 
 ###
 
-GET http://localhost:3000/api/v1/todos?parentId=5b262dea7f02b042a064eb3c
+GET http://localhost:3000/api/v1/todos/1c0439a8-5947-40ee-a5b3-192b275e69b0
+
+###
+
+GET http://localhost:3000/api/v1/todos?parentId=6738056a-d1a5-4280-b157-e640e176a286
 
 ###
 
@@ -10,8 +14,9 @@ POST http://localhost:3000/api/v1/todos
 content-type: application/json
 
 {
-    "name": "d1",
-    "parentId": "5b262e1f7f02b042a064eb3f"
+    "name": "child5.1",
+    "dueDate": 1530399770482,
+    "parentId": "6f8c4f93-4b67-4d1b-abbc-530864c82b91"
 }
 
 ###

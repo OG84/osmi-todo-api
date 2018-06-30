@@ -1,5 +1,5 @@
 export interface TodoDto {
-    _id?: string;
+    id?: string;
     parentId?: string;
     name: string;
     dueDate: string;

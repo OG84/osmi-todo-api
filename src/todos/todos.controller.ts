@@ -15,19 +15,22 @@ import {
   BadRequestException
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Todo } from 'todos/todo.model';
 import { TodoDto } from './todo.dto';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
 import { UpdateTodoException } from 'exceptions/update-todo.exception';
+import { Neo4jService } from 'shared/neo4j.service';
+import { Result } from 'neo4j-driver/types/v1';
 
 @Controller('api/v1/todos')
 export class TodosController {
   constructor(
     private readonly todosService: TodosService,
-    private readonly logger: Logger) { }
+    private readonly logger: Logger,
+    private readonly neo4jService: Neo4jService) { }
 
   @Get()
   getAll(@Query('parentId') parentId: string): Observable<TodoDto[]> {
@@ -48,16 +51,12 @@ export class TodosController {
     @Body() todo: TodoDto,
     @Query('copyChildrenFromId') copyChildrenFromId: string): Observable<TodoDto> {
 
-    if (todo._id) {
+    if (todo.id) {
       throw new BadRequestException('id required');
     }
 
-    if (todo.parentId === copyChildrenFromId) {
-      throw new BadRequestException('cannot copy todo into itself');
-    }
-
-    if (todo._id === null || todo._id === undefined) {
-      delete todo._id;
+    if (todo.id === null || todo.id === undefined) {
+      delete todo.id;
     }
 
     return this.todosService.create(todo, copyChildrenFromId);
@@ -68,11 +67,11 @@ export class TodosController {
     if (!todoId) {
       throw new BadRequestException('todoId path param required');
     }
-    if (todoId !== todo._id) {
+    if (todoId !== todo.id) {
       throw new BadRequestException('todoId path param does not match body');
     }
 
-    if (todo._id === todo.parentId) {
+    if (todo.id === todo.parentId) {
       throw new BadRequestException('todo cannot have itself as parent');
     }
 

@@ -51,7 +51,7 @@ export class TodosService {
         this.todosRepository.findByParentId(sourceTodoId).subscribe(todos => {
             for (const todo of todos) {
                 const todoCopy: TodoDto = {
-                    _id: undefined,
+                    id: undefined,
                     name: todo.name,
                     parentId: targetTodoId,
                     dueDate: todo.dueDate
@@ -59,7 +59,7 @@ export class TodosService {
 
                 this.logger.log('creating: ' + JSON.stringify(todoCopy));
 
-                this.create(todoCopy, todo._id).subscribe();
+                this.create(todoCopy, todo.id).subscribe();
             }
         });
     }

@@ -2,12 +2,18 @@ version: '3.1'
 
 services:
 
-  mongo:
-    image: mongo
+  neo4j:
+    image: neo4j:3.4.1
     ports:
-      - 27017:27017
-
-  mongo-express:
-    image: mongo-express
+      - 7474:7474
+      - 7473:7473
+      - 7687:7687
+  visualizer:
+    image: dockersamples/visualizer:stable
     ports:
-      - 8081:8081
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
