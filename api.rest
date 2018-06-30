@@ -21,13 +21,14 @@ content-type: application/json
 
 ###
 
-PUT http://localhost:3000/api/v1/todos/5b262e1f7f02b042a064eb3f
-content-type: application/json
+PUT http://localhost:3000/api/v1/todos/6738056a-d1a5-4280-b157-e640e176a286
+content-type: application/json;charset=utf-8
 
 {
-    "_id": "5b262e1f7f02b042a064eb3f",
+    "id": "6738056a-d1a5-4280-b157-e640e176a286",
     "name": "c1b",
-    "parentId": "5b2630f00f2c08449038b22a"
+    //"parentId": "5b2630f00f2c08449038b22a",
+    "dueDate": 1530399600043
 }
 
 ###

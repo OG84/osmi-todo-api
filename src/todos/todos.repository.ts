@@ -76,6 +76,9 @@ export class TodosRepository {
         return todo, parent.id as parentId`;
 
         return this.neo4jService.query(query, todo).pipe(
+            catchError(err => {
+                throw new UpdateTodoException(err);
+            }),
             this.mapToTodo('todo')
         );
     }
@@ -199,6 +202,9 @@ export class TodosRepository {
 
     private mapToTodo = (nodeName: string) =>
         map((x: StatementResult) => {
+            if (x.records.length === 0) {
+                throw new TodoNotFoundException();
+            }
             const todoNode = x.records[0].get(nodeName);
             const _parentId = x.records[0].get('parentId');
             const todo: Todo = {
@@ -209,5 +215,5 @@ export class TodosRepository {
             };
             return todo;
         })
-        // TODO: add mapping exception instead of creationexception
+    // TODO: add mapping exception instead of creationexception
 }

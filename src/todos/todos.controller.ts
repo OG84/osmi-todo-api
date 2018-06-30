@@ -67,6 +67,7 @@ export class TodosController {
     if (!todoId) {
       throw new BadRequestException('todoId path param required');
     }
+
     if (todoId !== todo.id) {
       throw new BadRequestException('todoId path param does not match body');
     }

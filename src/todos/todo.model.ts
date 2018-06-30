@@ -1,49 +1,7 @@
-import { Document, Model } from 'mongoose';
-import * as mongoose from 'mongoose';
-
-export interface Todo extends Document {
+export interface Todo {
     parentId: string;
     name: string;
     dueDate: string;
     path: string;
-
-    findParent(): Promise<Todo>;
+    id: string;
 }
-
-export interface TodoModel extends Model<Todo> {
-    findRoots(): Promise<Todo[]>;
-    findByParentId(parentId: string): Promise<Todo[]>;
-}
-
-export const todoSchema = new mongoose.Schema();
-
-todoSchema.add({
-    parentId: {
-        type: mongoose.SchemaTypes.ObjectId,
-        index: true
-    },
-    name: {
-        type: mongoose.SchemaTypes.String
-    },
-    dueDate: {
-        type: mongoose.SchemaTypes.Date,
-        index: true
-    },
-    path: {
-        type: mongoose.SchemaTypes.String
-    }
-});
-
-todoSchema.methods.findParent = function (cb) {
-    return this.model(todoCollectionName).find({ _id: this.parentId }, cb);
-};
-
-todoSchema.statics.findRoots = function (cb) {
-    return this.find({ parentId: null }, cb);
-};
-
-todoSchema.statics.findByParentId = function (parentId: string, cb) {
-    return this.find({ parentId: parentId }, cb);
-};
-
-export const todoCollectionName = 'Todo';
