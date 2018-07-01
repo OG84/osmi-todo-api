@@ -1,4 +1,3 @@
-import { Todo } from './todo.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
@@ -24,7 +23,7 @@ export class TodosRepository {
         ).subscribe();
     }
 
-    findRoots(): Observable<Todo[]> {
+    findRoots(): Observable<TodoDto[]> {
         this.logger.log(`findRoots`);
 
         const query = `match (root:Todo)-[:HAS_PARENT]->(notebook:Notebook)
@@ -58,17 +57,17 @@ export class TodosRepository {
         );
     }
 
-    create(todo: TodoDto): Observable<Todo> {
+    create(todo: TodoDto, createNewIds: boolean): Observable<TodoDto> {
         this.logger.log(`create: ${JSON.stringify(todo)}`);
 
         if (todo.parentId) {
-            return this.createChildTodo(todo);
+            return this.createChildTodo(todo, createNewIds);
         }
 
-        return this.createRootTodo(todo);
+        return this.createRootTodo(todo, createNewIds);
     }
 
-    update(todo: TodoDto): Observable<Todo> {
+    update(todo: TodoDto): Observable<TodoDto> {
         this.logger.log(`update: ${JSON.stringify(todo)}`);
 
         const updatePropertiesQuery = `match (todo:Todo {id: $id})
@@ -90,7 +89,13 @@ export class TodosRepository {
                 }
             }),
             switchMap(x => this.neo4jService.query(updatePropertiesQuery, todo)),
-            switchMap(x => this.neo4jService.query(setNewParentQuery, todo)),
+            switchMap(x => {
+                if (!todo.parentId) {
+                    return of(x);
+                }
+
+                return this.neo4jService.query(setNewParentQuery, todo);
+            }),
             catchError(err => {
                 throw new UpdateTodoException(err);
             }),
@@ -115,6 +120,10 @@ export class TodosRepository {
     }
 
     isAChildOfB(aId: string, bId: string): Observable<boolean> {
+        if (!bId) {
+            return of(false);
+        }
+
         const query = `match (b:Todo)<-[:HAS_PARENT*]-(a:Todo)
         where a.id=$A_ID
         and b.id=$B_ID
@@ -125,7 +134,18 @@ export class TodosRepository {
         );
     }
 
-    private createRootTodo(todo: TodoDto): Observable<Todo> {
+    findAllTodosInPathDownwards(todoId: string): Observable<TodoDto[]> {
+        const getAllChildrenQuery = `match (todo:Todo)<-[r:HAS_PARENT*]-(child:Todo)
+        where todo.id=$id
+        optional match (child)-[:HAS_PARENT]->(parent:Todo)
+        return child, parent.id as parentId`;
+
+        return this.neo4jService.query(getAllChildrenQuery, { id: todoId }).pipe(
+            this.mapToTodos('child')
+        );
+    }
+
+    private createRootTodo(todo: TodoDto, createNewIds: boolean): Observable<TodoDto> {
         const newId = uuid.v4();
         const query = `match (notebook:Notebook {id: $notebookId})
         create (newTodo:Todo {
@@ -135,13 +155,18 @@ export class TodosRepository {
         })-[:HAS_PARENT]->(notebook)
         return newTodo, null as parentId`;
 
+        let parameters = { ...todo, notebookId: 'defaultNotebook' };
+        if (createNewIds) {
+            parameters = { ...todo, id: newId, notebookId: 'defaultNotebook' };
+        }
+
         return this.isRootWithNameExisting(todo.name).pipe(
             tap(isNameExisting => {
                 if (isNameExisting) {
                     throw new DuplicateTodoException(todo);
                 }
             }),
-            switchMap(x => this.neo4jService.query(query, { ...todo, id: newId, notebookId: 'defaultNotebook' })),
+            switchMap(x => this.neo4jService.query(query, parameters)),
             this.mapToTodo('newTodo'),
             catchError(err => {
                 if (err instanceof DuplicateTodoException) {
@@ -153,7 +178,7 @@ export class TodosRepository {
         );
     }
 
-    private createChildTodo(todo: TodoDto): Observable<Todo> {
+    private createChildTodo(todo: TodoDto, createNewIds: boolean): Observable<TodoDto> {
         const newId = uuid.v4();
         const query = `match (parent:Todo {id: $parentId})
             create (newTodo:Todo {
@@ -163,20 +188,25 @@ export class TodosRepository {
             })-[:HAS_PARENT]->(parent)
             return newTodo, $parentId as parentId`;
 
+        let parameters = todo;
+        if (createNewIds) {
+            parameters = { ...todo, id: newId };
+        }
+
         return this.isChildWithNameExisting(todo.name, todo.parentId).pipe(
             tap(isNameExisting => {
                 if (isNameExisting) {
                     throw new DuplicateTodoException(todo);
                 }
             }),
-            switchMap(x => this.neo4jService.query(query, { ...todo, id: newId })),
+            switchMap(x => this.neo4jService.query(query, parameters)),
             this.mapToTodo('newTodo'),
             catchError(err => {
                 if (err instanceof DuplicateTodoException) {
                     throw err;
                 }
 
-                throw new CreateTodoException(err);
+                throw new CreateTodoException(JSON.stringify(err));
             })
         );
     }
@@ -230,8 +260,8 @@ export class TodosRepository {
         map((x: StatementResult) => {
             return x.records.map(record => {
                 const todoNode = record.get(nodeName);
-                const _parentId = x.records[0].get('parentId');
-                const todo: Todo = {
+                const _parentId = record.get('parentId');
+                const todo: TodoDto = {
                     id: todoNode.properties.id,
                     name: todoNode.properties.name,
                     parentId: _parentId,
@@ -248,7 +278,7 @@ export class TodosRepository {
             }
             const todoNode = x.records[0].get(nodeName);
             const _parentId = x.records[0].get('parentId');
-            const todo: Todo = {
+            const todo: TodoDto = {
                 id: todoNode.properties.id,
                 name: todoNode.properties.name,
                 parentId: _parentId,

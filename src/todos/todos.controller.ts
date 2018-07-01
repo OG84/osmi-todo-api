@@ -16,7 +16,6 @@ import {
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { Observable, of } from 'rxjs';
-import { Todo } from 'todos/todo.model';
 import { TodoDto } from './todo.dto';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';

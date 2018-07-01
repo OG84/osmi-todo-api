@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of, EMPTY } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { Todo, todoSchema } from '../todos/todo.model';
+import { catchError, map, tap, switchMap, withLatestFrom, concat } from 'rxjs/operators';
 import { TodosRepository } from './todos.repository';
 import { TodoDto } from './todo.dto';
+import * as uuid from 'node-uuid';
 
 @Injectable()
 export class TodosService {
@@ -12,7 +12,7 @@ export class TodosService {
         private readonly logger: Logger) {
     }
 
-    getRoots(): Observable<Todo[]> {
+    getRoots(): Observable<TodoDto[]> {
         return this.todosRepository.findRoots();
     }
 
@@ -24,26 +24,51 @@ export class TodosService {
         return this.todosRepository.findByParentId(parentId);
     }
 
-    create(todo: TodoDto, copyChildrenFromId?: string): Observable<Todo> {
-        let newTodoObservable = this.todosRepository.create(todo);
+    create(todo: TodoDto, copyChildrenFromId?: string): Observable<TodoDto> {
+        let newTodoObservable = this.todosRepository.create(todo, true);
 
         if (copyChildrenFromId) {
             this.logger.log('copying and attaching children from ' + copyChildrenFromId);
+
             newTodoObservable = newTodoObservable.pipe(
-                tap(newDbTodo => {
-                    this.copyChildren(copyChildrenFromId, newDbTodo.id);
-                })
+                // get all todos we want to copy
+                withLatestFrom(this.todosRepository.findAllTodosInPathDownwards(copyChildrenFromId)),
+                tap(([newTodo, children]) => {
+                    const newIdMapping = new Map<string, string>();
+                    newIdMapping.set(copyChildrenFromId, newTodo.id);
+
+                    let createTodosObservable: Observable<TodoDto> = EMPTY;
+                    for (const child of children) {
+                        // generate new ids for each todo we want to copy
+                        if (!newIdMapping.has(child.id)) {
+                            const newId = uuid.v4();
+                            newIdMapping.set(child.id, newId);
+                        }
+
+                        // chain all todo creation operations together
+                        const newId = newIdMapping.get(child.id);
+                        const newParentId = newIdMapping.get(child.parentId);
+                        createTodosObservable = createTodosObservable.pipe(
+                            concat(this.todosRepository.create({ ...child, id: newId, parentId: newParentId }, false))
+                        );
+                    }
+
+                    // execute all async todo creation operations after each other
+                    createTodosObservable.subscribe();
+                }),
+                // return the topmost todo we just created
+                map(([newTodo, children]) => newTodo)
             );
         }
 
         return newTodoObservable;
     }
 
-    update(todo: TodoDto): Observable<Todo> {
+    update(todo: TodoDto): Observable<TodoDto> {
         return this.todosRepository.update(todo);
     }
 
-    delete(todoId: string): Observable<Todo> {
+    delete(todoId: string): Observable<TodoDto> {
         return this.todosRepository.delete(todoId);
     }
 
