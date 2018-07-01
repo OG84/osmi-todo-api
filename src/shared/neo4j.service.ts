@@ -9,7 +9,10 @@ export class Neo4jService {
     private driver: Driver;
 
     constructor(private readonly logger: Logger) {
-        this.driver = neo4j.v1.driver('bolt://localhost:7687', neo4j.v1.auth.basic('neo4j', 'thodo'));
+        const neo4jAuth = process.env.NEO4J_AUTH;
+        const username = neo4jAuth.split('/')[0];
+        const password = neo4jAuth.split('/')[1];
+        this.driver = neo4j.v1.driver('bolt://localhost:7687', neo4j.v1.auth.basic(username, password));
     }
 
     query(query: string, parameters?: any): Observable<StatementResult> {
