@@ -20,8 +20,8 @@ import { TodoDto } from './todo.dto';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
-import { UpdateTodoException } from 'exceptions/update-todo.exception';
-import { Neo4jService } from 'shared/neo4j.service';
+import { UpdateTodoException } from '../exceptions/update-todo.exception';
+import { Neo4jService } from '../shared/neo4j.service';
 import { Result } from 'neo4j-driver/types/v1';
 
 @Controller('api/v1/todos')

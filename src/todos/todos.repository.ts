@@ -1,5 +1,3 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, of, from, throwError, EMPTY } from 'rxjs';
 import { TodoDto } from './todo.dto';
@@ -8,7 +6,7 @@ import { CreateTodoException } from '../exceptions/create-todo.exception';
 import { UpdateTodoException } from '../exceptions/update-todo.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
 import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
-import { Neo4jService } from 'shared/neo4j.service';
+import { Neo4jService } from '../shared/neo4j.service';
 import * as uuid from 'node-uuid';
 import { StatementResult } from 'neo4j-driver/types/v1';
 
