@@ -71,12 +71,26 @@ export class TodosRepository {
     update(todo: TodoDto): Observable<Todo> {
         this.logger.log(`update: ${JSON.stringify(todo)}`);
 
-        const query = `match (todo:Todo {id: $id})
+        const updatePropertiesQuery = `match (todo:Todo {id: $id})
         optional match (todo)-[:HAS_PARENT]->(parent:Todo)
         set todo.name=$name, todo.dueDate=$dueDate
         return todo, parent.id as parentId`;
 
-        return this.neo4jService.query(query, todo).pipe(
+        const setNewParentQuery = `match (todo:Todo)-[r:HAS_PARENT]->(currentParent), (newParent:Todo)
+        where todo.id=$id
+        and newParent.id=$parentId
+        delete r
+        create (todo)-[:HAS_PARENT]->(newParent)
+        return todo, newParent.id as parentId`;
+
+        return this.isAChildOfB(todo.parentId, todo.id).pipe(
+            tap(isNewParentChildOfTodo => {
+                if (isNewParentChildOfTodo) {
+                    throw new Error('cannot copy todo into itself');
+                }
+            }),
+            switchMap(x => this.neo4jService.query(updatePropertiesQuery, todo)),
+            switchMap(x => this.neo4jService.query(setNewParentQuery, todo)),
             catchError(err => {
                 throw new UpdateTodoException(err);
             }),
@@ -97,6 +111,17 @@ export class TodosRepository {
         return this.neo4jService.query(deleteTodoQuery, { id: todoId }).pipe(
             switchMap(x => this.neo4jService.query(deleteOrphanTodosQuery)),
             map(x => EMPTY)
+        );
+    }
+
+    isAChildOfB(aId: string, bId: string): Observable<boolean> {
+        const query = `match (b:Todo)<-[:HAS_PARENT*]-(a:Todo)
+        where a.id=$A_ID
+        and b.id=$B_ID
+        return case when count(a)=0 then false else true end as isConnected`;
+
+        return this.neo4jService.query(query, { A_ID: aId, B_ID: bId }).pipe(
+            map(x => x.records[0].get('isConnected') as boolean)
         );
     }
 
@@ -198,7 +223,7 @@ export class TodosRepository {
             name: $name
         })`, { id: 'defaultNotebook', name: 'Notebook 1' }).pipe(
             catchError(err => EMPTY)
-        );
+            );
     }
 
     private mapToTodos = (nodeName: string) =>
