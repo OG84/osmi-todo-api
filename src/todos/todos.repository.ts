@@ -1,4 +1,4 @@
-import { Todo, todoCollectionName, TodoModel } from './todo.model';
+import { Todo } from './todo.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
@@ -19,14 +19,15 @@ export class TodosRepository {
         private readonly logger: Logger,
         private readonly neo4jService: Neo4jService) {
 
-        this.createConstraints().subscribe();
+        this.createConstraints().pipe(
+            switchMap(x => this.initDefaultNodes())
+        ).subscribe();
     }
 
     findRoots(): Observable<Todo[]> {
         this.logger.log(`findRoots`);
 
-        const query = `match (root:Todo)
-        where not (root)-[:HAS_PARENT]->()
+        const query = `match (root:Todo)-[:HAS_PARENT]->(notebook:Notebook)
         return root, null as parentId`;
 
         return this.neo4jService.query(query).pipe(
@@ -83,25 +84,30 @@ export class TodosRepository {
         );
     }
 
-    delete(todoId: string): Observable<Todo> {
+    delete(todoId: string): Observable<any> {
         this.logger.log(`delete ${todoId}`);
 
-        const query = `match (a:Todo {id: $id})
-        detach delete a
-        return a as deletedTodo`;
+        const deleteTodoQuery = `match (todo:Todo {id: $id})
+        detach delete todo`;
 
-        return this.neo4jService.query(query, { id: todoId }).pipe(
-            this.mapToTodo('deletedTodo')
+        const deleteOrphanTodosQuery = `match (n:Todo)
+        where not((n)-[*]-(:Notebook))
+        detach delete n`;
+
+        return this.neo4jService.query(deleteTodoQuery, { id: todoId }).pipe(
+            switchMap(x => this.neo4jService.query(deleteOrphanTodosQuery)),
+            map(x => EMPTY)
         );
     }
 
     private createRootTodo(todo: TodoDto): Observable<Todo> {
         const newId = uuid.v4();
-        const query = `create (newTodo:Todo {
+        const query = `match (notebook:Notebook {id: $notebookId})
+        create (newTodo:Todo {
             id: $id,
             name: $name,
             dueDate: $dueDate
-        })
+        })-[:HAS_PARENT]->(notebook)
         return newTodo, null as parentId`;
 
         return this.isRootWithNameExisting(todo.name).pipe(
@@ -110,7 +116,7 @@ export class TodosRepository {
                     throw new DuplicateTodoException(todo);
                 }
             }),
-            switchMap(x => this.neo4jService.query(query, { ...todo, id: newId })),
+            switchMap(x => this.neo4jService.query(query, { ...todo, id: newId, notebookId: 'defaultNotebook' })),
             this.mapToTodo('newTodo'),
             catchError(err => {
                 if (err instanceof DuplicateTodoException) {
@@ -151,8 +157,7 @@ export class TodosRepository {
     }
 
     private isRootWithNameExisting(_name: string): Observable<boolean> {
-        const query = `match (root:Todo {name: $name})
-        where not (root)-[:HAS_PARENT]->()
+        const query = `match (root:Todo {name: $name})-[:HAS_PARENT]->(notebook:Notebook)
         return case when count(root)=0 then false else true end as isExisting`;
 
         return this.neo4jService.query(query, { name: _name }).pipe(
@@ -182,7 +187,18 @@ export class TodosRepository {
     }
 
     private createConstraints(): Observable<StatementResult> {
-        return this.neo4jService.query(`CREATE CONSTRAINT ON (todo:Todo) ASSERT todo.id IS UNIQUE`);
+        return this.neo4jService.query(`CREATE CONSTRAINT ON (todo:Todo) ASSERT todo.id IS UNIQUE`).pipe(
+            switchMap(x => this.neo4jService.query(`CREATE CONSTRAINT ON (notebook:Notebook) ASSERT notebook.id IS UNIQUE`))
+        );
+    }
+
+    private initDefaultNodes(): Observable<StatementResult> {
+        return this.neo4jService.query(`create (newNotebook:Notebook {
+            id: $id,
+            name: $name
+        })`, { id: 'defaultNotebook', name: 'Notebook 1' }).pipe(
+            catchError(err => EMPTY)
+        );
     }
 
     private mapToTodos = (nodeName: string) =>
