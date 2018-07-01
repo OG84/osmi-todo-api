@@ -79,7 +79,7 @@ export class TodosController {
   }
 
   @Delete(':todoId')
-  delete(@Param('todoId') todoId: string): Observable<Todo> {
+  delete(@Param('todoId') todoId: string): Observable<TodoDto> {
     return this.todosService.delete(todoId);
   }
 }

@@ -34,12 +34,13 @@ export class TodosService {
                 // get all todos we want to copy
                 withLatestFrom(this.todosRepository.findAllTodosInPathDownwards(copyChildrenFromId)),
                 tap(([newTodo, children]) => {
+                    // create an id map of the tree we want to copy
                     const newIdMapping = new Map<string, string>();
                     newIdMapping.set(copyChildrenFromId, newTodo.id);
 
                     let createTodosObservable: Observable<TodoDto> = EMPTY;
                     for (const child of children) {
-                        // generate new ids for each todo we want to copy
+                        // generate new ids for each todo we want to copy and map the id of the source todo to the new id
                         if (!newIdMapping.has(child.id)) {
                             const newId = uuid.v4();
                             newIdMapping.set(child.id, newId);
