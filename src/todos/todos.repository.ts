@@ -70,7 +70,7 @@ export class TodosRepository {
 
         const updatePropertiesQuery = `match (todo:Todo {id: $id})
         optional match (todo)-[:HAS_PARENT]->(parent:Todo)
-        set todo.name=$name, todo.dueDate=$dueDate
+        set todo.name=$name, todo.dueDate=$dueDate, todo.prio=$prio
         return todo, parent.id as parentId`;
 
         const setNewParentQuery = `match (todo:Todo)-[r:HAS_PARENT]->(currentParent), (newParent:Todo)
@@ -149,7 +149,8 @@ export class TodosRepository {
         create (newTodo:Todo {
             id: $id,
             name: $name,
-            dueDate: $dueDate
+            dueDate: $dueDate,
+            prio: $prio
         })-[:HAS_PARENT]->(notebook)
         return newTodo, null as parentId`;
 
@@ -182,7 +183,8 @@ export class TodosRepository {
             create (newTodo:Todo {
                 id: $id,
                 name: $name,
-                dueDate: $dueDate
+                dueDate: $dueDate,
+                prio: $prio
             })-[:HAS_PARENT]->(parent)
             return newTodo, $parentId as parentId`;
 
@@ -263,7 +265,8 @@ export class TodosRepository {
                     id: todoNode.properties.id,
                     name: todoNode.properties.name,
                     parentId: _parentId,
-                    dueDate: todoNode.properties.dueDate
+                    dueDate: todoNode.properties.dueDate,
+                    prio: todoNode.properties.prio
                 };
                 return todo;
             });
@@ -280,7 +283,8 @@ export class TodosRepository {
                 id: todoNode.properties.id,
                 name: todoNode.properties.name,
                 parentId: _parentId,
-                dueDate: todoNode.properties.dueDate
+                dueDate: todoNode.properties.dueDate,
+                prio: todoNode.properties.prio
             };
             return todo;
         })

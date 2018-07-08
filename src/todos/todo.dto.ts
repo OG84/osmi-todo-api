@@ -3,4 +3,5 @@ export interface TodoDto {
     parentId?: string;
     name: string;
     dueDate: string;
+    prio: number;
 }

@@ -25,6 +25,10 @@ export class TodosService {
     }
 
     create(todo: TodoDto, copyChildrenFromId?: string): Observable<TodoDto> {
+        if (!todo.prio) {
+            todo.prio = 0;
+        }
+
         let newTodoObservable = this.todosRepository.create(todo, true);
 
         if (copyChildrenFromId) {
