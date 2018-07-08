@@ -84,7 +84,8 @@ export class TodosService {
                     id: undefined,
                     name: todo.name,
                     parentId: targetTodoId,
-                    dueDate: todo.dueDate
+                    dueDate: todo.dueDate,
+                    prio: todo.prio
                 };
 
                 this.logger.log('creating: ' + JSON.stringify(todoCopy));
