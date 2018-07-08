@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
 
-  todo-neo4j:
+  neo4j:
     image: neo4j:3.4.1
     ports:
       - 7474:7474
@@ -11,7 +11,7 @@ services:
     environment:
       - NEO4J_AUTH
 
-  todo-api:
+  api:
     image: todo-api
     ports:
       - 3000:3000
