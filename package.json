@@ -31,7 +31,7 @@
     "fastify-formbody": "^2.0.0",
     "joi": "^13.3.0",
     "mongoose": "^5.1.5",
-    "neo4j-driver": "^1.6.1",
+    "neo4j-driver": "^1.6.2",
     "node-uuid": "^1.4.8",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.2.0",

@@ -6,10 +6,11 @@ WORKDIR /usr/app
 RUN yarn
 RUN yarn webpack-prod
 
-FROM node as runtime-env
-WORKDIR /usr/app
-COPY --from=build-env /usr/app/dist .
-COPY --from=build-env /usr/app/config ./config
-
+FROM neo4j as runtime-env
+RUN apk add --update nodejs
+COPY --from=build-env /usr/app/dist /usr/app/
+COPY --from=build-env /usr/app/devops/multi-service.sh /usr/app/multi-service.sh
 EXPOSE 3000
-ENTRYPOINT [ "node", "server.js" ]
+ENV environment=prod
+
+CMD /usr/app/multi-service.sh

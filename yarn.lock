@@ -4654,9 +4654,9 @@ neo-async@^2.5.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.5.1.tgz#acb909e327b1e87ec9ef15f41b8a269512ad41ee"
 
-neo4j-driver@^1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-1.6.1.tgz#22a9b383494c15614045a1bc15666b6bb1814b36"
+neo4j-driver@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-1.6.2.tgz#dac13eda00e27a385419db4e2e2313c3f0713294"
   dependencies:
     babel-runtime "^6.18.0"
     uri-js "^4.2.1"
