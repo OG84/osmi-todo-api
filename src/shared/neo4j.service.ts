@@ -15,8 +15,13 @@ export class Neo4jService {
         const neo4jAuth = process.env.NEO4J_AUTH;
         const username = neo4jAuth.split('/')[0];
         const password = neo4jAuth.split('/')[1];
+
+        const connectionString = `bolt://${environment === 'dev' ? 'localhost' : 'neo4j'}:7687`;
+        this.logger.log('connectionString: ' + connectionString);
+        this.logger.log('username: ' + username);
+        this.logger.log('password: ' + password);
         this.driver = neo4j.v1.driver(
-            `bolt://${environment === 'dev' ? 'localhost' : 'neo4j'}`,
+            connectionString,
             neo4j.v1.auth.basic(username, password));
     }
 
