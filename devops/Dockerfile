@@ -11,5 +11,5 @@ WORKDIR /usr/app
 COPY --from=build-env /usr/app/dist .
 COPY --from=build-env /usr/app/config ./config
 
-EXPOSE 3000
+EXPOSE 3000 7474 7473 7687
 ENTRYPOINT [ "node", "server.js" ]

@@ -16,10 +16,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "webpack --config webpack.config.js",
     "webpack-prod": "webpack --config webpack.config.prod.js",
-    "docker-run-stack": "docker build -t todo-api -f devops/Dockerfile . && docker stack deploy -c ./devops/prod-stack.yml todo-api-stack",
-    "docker-run-stack:dev": "docker stack deploy -c ./devops/dev-stack.yml todo-api-stack",
-    "docker-run-stack:latest": "yarn git pull && docker-run-stack",
-    "docker-stop-stack": "docker stack rm todo-api-stack"
+    "docker-run": "docker build -t todo-api -f devops/Dockerfile . && docker stack deploy -c ./devops/prod-stack.yml todo-api-stack",
+    "docker-run:dev": "docker stack deploy -c ./devops/dev-stack.yml todo-api-stack",
+    "docker-run:latest": "yarn git pull && docker-run-stack",
+    "docker-stop": "docker stack rm todo-api-stack"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.1",
