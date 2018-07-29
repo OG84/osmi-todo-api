@@ -18,9 +18,6 @@ export class Neo4jService {
         const password = neo4jAuth.split('/')[1];
 
         const connectionString = `bolt://${environment === 'dev' ? 'localhost' : 'neo4j'}:7687`;
-        this.logger.log('connectionString: ' + connectionString);
-        this.logger.log('username: ' + username);
-        this.logger.log('password: ' + password);
 
         this.neo4jReady.subscribe(x =>
             this.logger.log('neo4j connection established.'));
