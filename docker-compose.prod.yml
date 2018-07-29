@@ -16,3 +16,5 @@ services:
       - 3000:3000
     environment:
       - NEO4J_AUTH
+    depends_on:
+      - "neo4j"
