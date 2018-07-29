@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of, EMPTY } from 'rxjs';
 import { catchError, map, tap, switchMap, withLatestFrom, concat } from 'rxjs/operators';
 import { TodosRepository } from './todos.repository';
-import { TodoDto } from './todo.dto';
+import { TodoDto, DropType } from './todo.dto';
 import * as uuid from 'node-uuid';
 
 @Injectable()
@@ -70,28 +70,31 @@ export class TodosService {
     }
 
     update(todo: TodoDto): Observable<TodoDto> {
-        return this.todosRepository.update(todo);
+        return this.shuffleSpaceForUpdatedPrio(todo).pipe(
+            switchMap(x => this.todosRepository.update(todo)));
     }
 
     delete(todoId: string): Observable<TodoDto> {
         return this.todosRepository.delete(todoId);
     }
 
-    private copyChildren(sourceTodoId: string, targetTodoId: string): void {
-        this.todosRepository.findByParentId(sourceTodoId).subscribe(todos => {
-            for (const todo of todos) {
-                const todoCopy: TodoDto = {
-                    id: undefined,
-                    name: todo.name,
-                    parentId: targetTodoId,
-                    dueDate: todo.dueDate,
-                    prio: todo.prio
-                };
+    /**
+     * Increases the prio of all siblings with a prio greater and equal the given todo.
+     * @param todo todo to read the prio from
+     * @returns the same todo
+     */
+    private shuffleSpaceForUpdatedPrio(todo: TodoDto): Observable<TodoDto> {
+        if (todo.dropType === DropType.AFTER) {
+            return this.todosRepository.increasePrioOfSiblingsAfter(todo).pipe(
+                map(x => todo)
+            );
+        } else if (todo.dropType === DropType.BEFORE) {
+            return this.todosRepository.decreasePrioOfSiblingsBefore(todo).pipe(
+                map(x => todo)
+            );
+        }
 
-                this.logger.log('creating: ' + JSON.stringify(todoCopy));
+        return of(todo);
 
-                this.create(todoCopy, todo.id).subscribe();
-            }
-        });
     }
 }

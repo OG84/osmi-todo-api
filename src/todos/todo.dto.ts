@@ -4,4 +4,10 @@ export interface TodoDto {
     name: string;
     dueDate: string;
     prio: number;
+    dropType?: DropType;
 }
+
+export enum DropType {
+    BEFORE = 'BEFORE',
+    AFTER = 'AFTER'
+  }

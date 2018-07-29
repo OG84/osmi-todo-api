@@ -5,31 +5,20 @@ import {
   Body,
   Delete,
   Param,
-  Res,
-  HttpStatus,
-  HttpException,
   Put,
   Logger,
   Query,
-  UseFilters,
   BadRequestException
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TodoDto } from './todo.dto';
-import { catchError, switchMap } from 'rxjs/operators';
-import { TodoNotFoundException } from '../exceptions/todo-not-found.exception';
-import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
-import { UpdateTodoException } from '../exceptions/update-todo.exception';
-import { Neo4jService } from '../shared/neo4j.service';
-import { Result } from 'neo4j-driver/types/v1';
 
 @Controller('api/v1/todos')
 export class TodosController {
   constructor(
     private readonly todosService: TodosService,
-    private readonly logger: Logger,
-    private readonly neo4jService: Neo4jService) { }
+    private readonly logger: Logger) { }
 
   @Get()
   getAll(@Query('parentId') parentId: string): Observable<TodoDto[]> {

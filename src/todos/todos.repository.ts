@@ -57,6 +57,46 @@ export class TodosRepository {
         );
     }
 
+    increasePrioOfSiblingsAfter(todo: TodoDto): Observable<TodoDto> {
+        this.logger.log('increase');
+        let query = `match (siblingTodo: Todo)-[:HAS_PARENT]->(parent:Notebook)
+        where siblingTodo.prio >= $prio
+        and siblingTodo.id <> $id
+        set siblingTodo.prio=siblingTodo.prio + 1
+        return siblingTodo, null as parentId`;
+
+        if (todo.parentId) {
+            query = `match (siblingTodo: Todo)-[:HAS_PARENT]->(parent:Todo)
+        where siblingTodo.prio >= $prio
+        and siblingTodo.id <> $id and siblingTodo.parentId = $parentId
+        set siblingTodo.prio=siblingTodo.prio + 1
+        return siblingTodo, parent.id as parentId`;
+        }
+
+        return this.neo4jService.query(query, todo)
+            .pipe(map(x => todo));
+    }
+
+    decreasePrioOfSiblingsBefore(todo: TodoDto): Observable<TodoDto> {
+        this.logger.log('decrease');
+        let query = `match (siblingTodo: Todo)-[:HAS_PARENT]->(parent:Notebook)
+        where siblingTodo.prio <= $prio
+        and siblingTodo.id <> $id
+        set siblingTodo.prio=siblingTodo.prio - 1
+        return siblingTodo, null as parentId`;
+
+        if (todo.parentId) {
+            query = `match (siblingTodo: Todo)-[:HAS_PARENT]->(parent:Todo)
+        where siblingTodo.prio <= $prio
+        and siblingTodo.id <> $id and siblingTodo.parentId = $parentId
+        set siblingTodo.prio=siblingTodo.prio - 1
+        return siblingTodo, parent.id as parentId`;
+        }
+
+        return this.neo4jService.query(query, todo)
+            .pipe(map(x => todo));
+    }
+
     create(todo: TodoDto, createNewIds: boolean): Observable<TodoDto> {
         this.logger.log(`create: ${JSON.stringify(todo)}`);
 
@@ -115,7 +155,7 @@ export class TodosRepository {
 
         return this.neo4jService.query(deleteTodoQuery, { id: todoId }).pipe(
             switchMap(x => this.neo4jService.query(deleteOrphanTodosQuery)),
-            map(x => EMPTY)
+            map(x => of(todoId))
         );
     }
 
@@ -254,8 +294,10 @@ export class TodosRepository {
             id: $id,
             name: $name
         })`, { id: 'defaultNotebook', name: 'Notebook 1' }).pipe(
-            catchError(err => EMPTY)
-            );
+            catchError(err => {
+                this.logger.error(err);
+                return of(err);
+            }));
     }
 
     private mapToTodos = (nodeName: string) =>

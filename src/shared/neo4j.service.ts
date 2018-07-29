@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as neo4j from 'neo4j-driver';
-import { Driver, Result, StatementResult } from 'neo4j-driver/types/v1';
-import { Observable, from, of, EMPTY, timer, Subject, interval } from 'rxjs';
-import { tap, catchError, map, takeUntil, delay, delayWhen } from 'rxjs/operators';
+import { Driver, StatementResult } from 'neo4j-driver/types/v1';
+import { Observable, from } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class Neo4jService {
