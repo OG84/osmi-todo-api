@@ -1,7 +1,7 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import { Observable, of, from, throwError, EMPTY, timer } from 'rxjs';
+import { Observable, of, EMPTY } from 'rxjs';
 import { TodoDto } from './todo.dto';
-import { map, catchError, tap, switchMap, withLatestFrom, first } from 'rxjs/operators';
+import { map, catchError, tap, switchMap, first, delay } from 'rxjs/operators';
 import { CreateTodoException } from '../exceptions/create-todo.exception';
 import { UpdateTodoException } from '../exceptions/update-todo.exception';
 import { DuplicateTodoException } from '../exceptions/duplicate-todo.exception';
@@ -16,7 +16,8 @@ export class TodosRepository {
         private readonly logger: Logger,
         private readonly neo4jService: Neo4jService) {
 
-        this.neo4jService.neo4jReady.pipe(
+        of(true).pipe(
+            delay(10000),
             switchMap(x => this.createConstraints().pipe(first())),
             switchMap(x => this.initDefaultNodes().pipe(first()))
         ).subscribe();

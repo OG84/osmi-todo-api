@@ -1,7 +1,6 @@
 import { Module, Logger } from '@nestjs/common';
 import { TodosController } from './todos/todos.controller';
 import { TodosService } from './todos/todos.service';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TodosRepository } from './todos/todos.repository';
 import { ConfigService } from './config.service';
 import * as dotenv from 'dotenv';
