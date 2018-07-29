@@ -30,8 +30,8 @@ export class Neo4jService {
                     this.driver = neo4j.v1.driver(
                         connectionString,
                         neo4j.v1.auth.basic(username, password));
-                    neo4jReady.next();
-                    neo4jReady.complete();
+                    this.neo4jReady.next();
+                    this.neo4jReady.complete();
                 } catch (err) {
                     this.logger.warn('no neo4j connection available yet, trying again...');
                 }
