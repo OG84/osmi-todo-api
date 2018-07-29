@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as neo4j from 'neo4j-driver';
 import { Driver, Result, StatementResult } from 'neo4j-driver/types/v1';
 import { Observable, from, of, EMPTY, timer, Subject, interval } from 'rxjs';
-import { tap, catchError, map, takeUntil } from 'rxjs/operators';
+import { tap, catchError, map, takeUntil, delay, delayWhen } from 'rxjs/operators';
 
 @Injectable()
 export class Neo4jService {
@@ -22,19 +22,15 @@ export class Neo4jService {
         this.neo4jReady.subscribe(x =>
             this.logger.log('neo4j connection established.'));
 
-        // asynchronously check every second for the neo4j connection
-        interval(1000)
-            .pipe(takeUntil(this.neo4jReady))
+        // wait 10 seconds until neo4j is ready
+        of(true).pipe(delay(10000))
             .subscribe(x => {
-                try {
-                    this.driver = neo4j.v1.driver(
-                        connectionString,
-                        neo4j.v1.auth.basic(username, password));
-                    this.neo4jReady.next();
-                    this.neo4jReady.complete();
-                } catch (err) {
-                    this.logger.warn('no neo4j connection available yet, trying again...');
-                }
+                this.driver = neo4j.v1.driver(
+                    connectionString,
+                    neo4j.v1.auth.basic(username, password));
+
+                this.neo4jReady.next();
+                this.neo4jReady.complete();
             });
     }
 
