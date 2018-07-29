@@ -16,7 +16,7 @@ export class TodosRepository {
         private readonly logger: Logger,
         private readonly neo4jService: Neo4jService) {
 
-        timer(5000).pipe(
+        this.neo4jService.neo4jReady.pipe(
             switchMap(x => this.createConstraints().pipe(first())),
             switchMap(x => this.initDefaultNodes().pipe(first()))
         ).subscribe();

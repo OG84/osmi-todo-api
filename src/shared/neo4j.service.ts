@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as neo4j from 'neo4j-driver';
 import { Driver, Result, StatementResult } from 'neo4j-driver/types/v1';
-import { Observable, from, of, EMPTY } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { Observable, from, of, EMPTY, timer, Subject, interval } from 'rxjs';
+import { tap, catchError, map, takeUntil } from 'rxjs/operators';
 
 @Injectable()
 export class Neo4jService {
+    neo4jReady = new Subject();
     private driver: Driver;
 
     constructor(private readonly logger: Logger) {
@@ -20,9 +21,24 @@ export class Neo4jService {
         this.logger.log('connectionString: ' + connectionString);
         this.logger.log('username: ' + username);
         this.logger.log('password: ' + password);
-        this.driver = neo4j.v1.driver(
-            connectionString,
-            neo4j.v1.auth.basic(username, password));
+
+        this.neo4jReady.subscribe(x =>
+            this.logger.log('neo4j connection established.'));
+
+        // asynchronously check every second for the neo4j connection
+        interval(1000)
+            .pipe(takeUntil(this.neo4jReady))
+            .subscribe(x => {
+                try {
+                    this.driver = neo4j.v1.driver(
+                        connectionString,
+                        neo4j.v1.auth.basic(username, password));
+                    neo4jReady.next();
+                    neo4jReady.complete();
+                } catch (err) {
+                    this.logger.warn('no neo4j connection available yet, trying again...');
+                }
+            });
     }
 
     query(query: string, parameters?: any): Observable<StatementResult> {
